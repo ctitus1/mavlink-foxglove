@@ -7,7 +7,13 @@ import json
 import pytest
 
 from mavlink_foxglove.dialect import load_dialect, message_classes, message_name
-from mavlink_foxglove.encoding import encode_message, enum_label, sanitize, topic_for
+from mavlink_foxglove.encoding import (
+    encode_message,
+    enum_label,
+    flag_labels,
+    sanitize,
+    topic_for,
+)
 from mavlink_foxglove.schema import META_KEY, field_specs
 
 NS = 1_700_000_000_123_456_789
@@ -88,6 +94,40 @@ def test_encode_adds_enum_names(common):
     out = encode_message(msg, common, NS)
     assert out["fix_type"] == 3
     assert out["fix_type_enum"] == "GPS_FIX_TYPE_3D_FIX"
+
+
+def test_bitmask_decodes_to_a_list_of_flags(common):
+    """A bitmask holds several flags, so a single enum name cannot describe it."""
+    # 209 = SAFETY_ARMED | STABILIZE | MANUAL_INPUT | CUSTOM_MODE
+    flags = flag_labels(common, "MAV_MODE_FLAG", 209)
+    assert "MAV_MODE_FLAG_SAFETY_ARMED" in flags
+    assert "MAV_MODE_FLAG_CUSTOM_MODE_ENABLED" in flags
+    assert len(flags) == 4
+
+
+def test_bitmask_ignores_non_power_of_two_entries(common):
+    """Enum tables contain composite and sentinel entries that are not flags."""
+    for name in flag_labels(common, "MAV_MODE_FLAG", 209):
+        matching = [b for b, e in common.enums["MAV_MODE_FLAG"].items() if e.name == name]
+        assert matching and matching[0] & (matching[0] - 1) == 0
+
+
+def test_bitmask_of_zero_is_empty(common):
+    assert flag_labels(common, "MAV_MODE_FLAG", 0) == []
+
+
+def test_unknown_bitmask_enum_is_empty(common):
+    assert flag_labels(common, "NO_SUCH_ENUM", 255) == []
+
+
+def test_encode_emits_flags_not_enum_for_bitmask_fields(common):
+    """HEARTBEAT.base_mode is a bitmask; base_mode_enum would be null for it."""
+    msg = _received(common.MAVLink_heartbeat_message(2, 12, 209, 0, 4, 3))
+    out = encode_message(msg, common, NS)
+    assert "base_mode_enum" not in out
+    assert "MAV_MODE_FLAG_SAFETY_ARMED" in out["base_mode_flags"]
+    # Plain (non-bitmask) enum fields still get the singular companion.
+    assert out["system_status_enum"] == "MAV_STATE_ACTIVE"
 
 
 def test_topic_template(common):

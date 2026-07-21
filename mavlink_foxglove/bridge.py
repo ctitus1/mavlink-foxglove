@@ -15,9 +15,9 @@ from typing import Any
 
 from foxglove_websocket.server import FoxgloveServer
 
-from . import derived
 from .channels import ChannelRegistry
 from .config import Config
+from .derived import DerivedPublisher
 from .dialect import configure_mavutil, load_dialect, message_classes, message_name
 from .encoding import encode_message, topic_for
 from .schema import message_schema
@@ -46,6 +46,8 @@ class MavlinkFoxgloveBridge:
         # Schemas are derived once per message class and reused across every
         # (system, component) that emits that message.
         self._schema_cache: dict[str, dict[str, Any]] = {}
+        # Holds per-vehicle pose state, so it must outlive individual messages.
+        self._derived = DerivedPublisher()
         self._server: FoxgloveServer | None = None
         self._registry: ChannelRegistry | None = None
 
@@ -137,7 +139,7 @@ class MavlinkFoxgloveBridge:
         source_topic: str,
         receive_time_ns: int,
     ) -> None:
-        for item in derived.convert(name, msg, receive_time_ns):
+        for item in self._derived.convert(name, msg, receive_time_ns):
             # Derived topics sit alongside their source, e.g.
             # /mavlink/1/1/ATTITUDE -> /mavlink/1/1/attitude_transform.
             topic = source_topic.rsplit("/", 1)[0] + "/" + item.topic_suffix

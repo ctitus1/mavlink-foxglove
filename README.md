@@ -78,7 +78,7 @@ read naturally (`/mavlink/1/1/ATTITUDE.roll`). Routing metadata is nested under
 Each channel is advertised with a JSON Schema generated from pymavlink's own
 field metadata, including **units** and **enum names** in field descriptions.
 
-### Enum name companions
+### Enum and bitmask companions
 
 Enum-typed fields get a `<field>_enum` string alongside the raw number, so
 tables and state-transition panels are readable:
@@ -87,7 +87,23 @@ tables and state-transition panels are readable:
 { "fix_type": 3, "fix_type_enum": "GPS_FIX_TYPE_3D_FIX" }
 ```
 
-Disable with `--no-enum-names`.
+Bitmask fields (52 of them across the dialect) instead get a `<field>_flags`
+**array**, because a bitmask holds several flags at once and no single symbolic
+name describes it — `base_mode` 209 matches no individual `MAV_MODE_FLAG` entry:
+
+```json
+{
+  "base_mode": 209,
+  "base_mode_flags": [
+    "MAV_MODE_FLAG_CUSTOM_MODE_ENABLED",
+    "MAV_MODE_FLAG_STABILIZE_ENABLED",
+    "MAV_MODE_FLAG_MANUAL_INPUT_ENABLED",
+    "MAV_MODE_FLAG_SAFETY_ARMED"
+  ]
+}
+```
+
+Disable both with `--no-enum-names`.
 
 ### Derived channels — Foxglove well-known schemas
 
@@ -96,15 +112,108 @@ they only drive the Raw Message, Table and Plot panels. The bridge additionally
 republishes a few messages under schema names Foxglove recognises, which lights
 up the richer panels:
 
-| Source MAVLink message | Derived topic         | Schema                 | Enables       |
-| ---------------------- | --------------------- | ---------------------- | ------------- |
-| `GLOBAL_POSITION_INT`  | `.../location`        | `foxglove.LocationFix` | Map panel     |
-| `GPS_RAW_INT`          | `.../gps_location`    | `foxglove.LocationFix` | Map panel     |
-| `ATTITUDE`             | `.../attitude_transform` | `foxglove.FrameTransform` | 3D panel |
-| `STATUSTEXT`           | `.../log`             | `foxglove.Log`         | Log panel     |
+| Source MAVLink message | Derived topic | Schema | Enables |
+| --- | --- | --- | --- |
+| `LOCAL_POSITION_NED` + `ATTITUDE` | `.../pose` | `foxglove.FrameTransform` | 3D panel |
+| `GLOBAL_POSITION_INT` | `.../location` | `foxglove.LocationFix` | Map panel |
+| `GPS_RAW_INT` | `.../gps_location` | `foxglove.LocationFix` | Map panel |
+| `HOME_POSITION` | `.../home_location` | `foxglove.LocationFix` | Map panel |
+| `GPS_GLOBAL_ORIGIN` | `.../ekf_origin_location` | `foxglove.LocationFix` | Map panel |
+| `STATUSTEXT` | `.../log` | `foxglove.Log` | Log panel |
 
-Disable with `--no-derived-topics`. Adding a converter is a single entry in
-`CONVERTERS` in `mavlink_foxglove/derived.py`.
+Disable with `--no-derived-topics`. Adding a stateless converter is a single
+entry in `CONVERTERS` in `mavlink_foxglove/derived.py`.
+
+## Quick start: 3D visualization
+
+This is the shortest path to seeing the vehicle move in 3D, positioned relative
+to its EKF origin, with orientation, altitude, and a map track.
+
+### The topics you need
+
+| You want | Topic | Panel |
+| --- | --- | --- |
+| Vehicle in 3D relative to EKF origin, with orientation | `/mavlink/1/1/pose` | **3D** |
+| Lat/lon track | `/mavlink/1/1/location` | **Map** |
+| Home / launch point | `/mavlink/1/1/home_location` | **Map** |
+| EKF origin the local frame is measured from | `/mavlink/1/1/ekf_origin_location` | **Map** |
+| Altitude above home, in metres | `/mavlink/1/1/ALTITUDE.altitude_relative` | **Plot** |
+| Altitude AMSL, in metres | `/mavlink/1/1/ALTITUDE.altitude_amsl` | **Plot** |
+| XY position on a grid, in metres | `/mavlink/1/1/LOCAL_POSITION_NED.y` vs `.x` | **Plot** (X-axis: *message path*) |
+| Roll / pitch / yaw, in radians | `/mavlink/1/1/ATTITUDE.roll`, `.pitch`, `.yaw` | **Plot** |
+| Ground speed, climb rate | `/mavlink/1/1/VFR_HUD.groundspeed`, `.climb` | **Plot** |
+| Battery | `/mavlink/1/1/SYS_STATUS.battery_remaining` | **Gauge** |
+| Armed state | `/mavlink/1/1/HEARTBEAT.base_mode_flags` (contains `MAV_MODE_FLAG_SAFETY_ARMED`) | **Table** |
+| Vehicle state | `/mavlink/1/1/HEARTBEAT.system_status_enum` | **Indicator** |
+| Status messages | `/mavlink/1/1/log` | **Log** |
+
+Replace `1/1` with your vehicle's system/component ID if it differs.
+
+### Setting up the 3D panel
+
+1. Add a **3D** panel.
+2. Under *Transforms*, both `map` and `base_link` appear once `/mavlink/1/1/pose`
+   has been received.
+3. Set **Follow frame** to `map` to watch the vehicle fly around a fixed origin,
+   or `base_link` to ride along with it.
+4. The default grid is 1 m per cell in the `map` plane, which is the XY grid
+   centred on the EKF origin.
+
+To draw a vehicle model, add a **URDF** or **glTF** asset in the 3D panel and
+attach it to the `base_link` frame.
+
+### Plotting XY position on a grid
+
+In a **Plot** panel, set the X-axis to *message path* and use:
+
+* X axis: `/mavlink/1/1/LOCAL_POSITION_NED.y` (East, metres)
+* Y series: `/mavlink/1/1/LOCAL_POSITION_NED.x` (North, metres)
+
+That gives a top-down ground track in metres from the EKF origin. Note the
+axis swap: MAVLink's `x` is North and `y` is East.
+
+### What your vehicle must send
+
+The derived topics only appear if the vehicle emits their source messages.
+PX4 and ArduPilot both send all of these by default over a normal telemetry
+link, but at rates that vary by stream configuration:
+
+| Message | Needed for |
+| --- | --- |
+| `ATTITUDE` | Orientation in 3D |
+| `LOCAL_POSITION_NED` | Position in 3D, XY grid |
+| `GLOBAL_POSITION_INT` | Map track |
+| `HOME_POSITION` | Home marker (sent on arming / on request) |
+| `GPS_GLOBAL_ORIGIN` | EKF origin marker (sent once when the EKF initialises) |
+| `ALTITUDE` | Altitude plots in metres |
+
+If `/mavlink/1/1/pose` never appears, the vehicle is not sending `ATTITUDE` or
+`LOCAL_POSITION_NED` — check with the Raw Message panel on the generic channels,
+or `docker logs` which reports the count of distinct message types received.
+
+### Coordinate frames
+
+MAVLink is **NED** (North-East-Down) with an **FRD** body frame, the aerospace
+convention. Foxglove's 3D panel is **Z-up**, matching ROS REP-103 **ENU**
+(East-North-Up) with an **FLU** body frame.
+
+The bridge converts derived poses to ENU, because publishing NED directly puts
+the vehicle underground with inverted attitude:
+
+| | MAVLink (NED/FRD) | Foxglove (`.../pose`, ENU/FLU) |
+| --- | --- | --- |
+| X | North | East |
+| Y | East | North |
+| Z | Down | Up |
+| Yaw | Clockwise from North | Counter-clockwise from East |
+
+**The raw values are never modified** — `LOCAL_POSITION_NED` and `ATTITUDE` on
+the generic channels remain exactly as the vehicle sent them. Only `.../pose`
+is converted.
+
+The `map` frame is the vehicle's **EKF/local origin**, which for most flights is
+where it was armed. It is not a geographic datum; use the Map panel and
+`.../ekf_origin_location` to tie it to real coordinates.
 
 ## Configuration
 
@@ -177,7 +286,7 @@ Each module has one job and is independently testable.
 | `encoding.py` | pymavlink message object → JSON-safe dict |
 | `channels.py` | Lazily advertise Foxglove channels, cache topic → channel ID |
 | `source.py` | Blocking pymavlink reader on a thread → asyncio queue |
-| `derived.py` | Pure converters to Foxglove well-known schemas |
+| `derived.py` | Converters to Foxglove well-known schemas, plus per-vehicle pose fusion |
 | `bridge.py` | Wiring only |
 
 ### Notable implementation details
@@ -208,6 +317,19 @@ The generated schema flags affected fields in their description.
 `str` on modern pymavlink and `bytes` on older releases, and are not always valid
 UTF-8, so decoding uses `errors="replace"` and never raises.
 
+**Pose must be fused, not published twice.** Position (`LOCAL_POSITION_NED`) and
+orientation (`ATTITUDE`) arrive in separate messages at independent rates, but a
+transform needs both. `DerivedPublisher` keeps the last-known half per vehicle
+and republishes a fused `map` → `base_link` transform whenever either updates.
+Publishing two competing transforms for the same frame pair would make the
+vehicle jump between the origin and its true position.
+
+**Bitmasks are not enums.** 52 fields across the dialect are bitmasks, where a
+single symbolic name is meaningless — `MAV_MODE_FLAG` 209 matches no entry.
+Those fields get a `_flags` array instead of an `_enum` string, decoded from
+the power-of-two entries only, so composite and `*_ENUM_END` sentinel values are
+never mistaken for flags.
+
 **Backpressure is bounded.** A stalled Foxglove client must not let the bridge
 grow without limit, so the queue drops oldest messages and counts them; drops
 appear in the periodic stats line.
@@ -223,13 +345,13 @@ pip install -e '.[dev]'
 pytest
 ```
 
-The suite has 38 tests in four files:
+The suite has 56 tests in four files:
 
 | File | Covers |
 | --- | --- |
 | `tests/test_schema.py` | Schema generation for **every message in every dialect**; the field-ordering regression |
 | `tests/test_encoding.py` | JSON validity for **every message**, with NaN in every float field |
-| `tests/test_derived.py` | Well-known schema converters, including non-finite input |
+| `tests/test_derived.py` | Well-known schema converters, NED→ENU conversion, pose fusion across vehicles |
 | `tests/test_integration.py` | Real UDP → real bridge → real Foxglove protocol client, validating payloads against advertised schemas |
 
 `tests/test_integration.py` is the meaningful one: it runs the actual bridge,
@@ -283,9 +405,12 @@ non-zero on failure, which is how CI gates the image.
 
 Against the running container, driven by the test publisher over host UDP:
 
-* **205 message types** received and advertised as channels, plus 4 derived
-  channels — 209 total.
-* **All 209 advertised schemas** validate as legal JSON Schema documents.
+* **205 message types** received and advertised as channels, plus the derived
+  channels.
+* **All advertised schemas** validate as legal JSON Schema documents.
+* **The fused pose is geometrically correct**: a synthetic 20 m circle at 15 m
+  altitude reads back as radius 20.00 m with `z = +15.0` (up), confirming the
+  NED→ENU conversion.
 * **Live payloads validate against their own advertised schemas**, with no
   `NaN`/`Infinity` tokens on the wire.
 * **Zero errors** in container logs across the full-dialect sweep;

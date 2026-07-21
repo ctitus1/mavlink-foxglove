@@ -98,14 +98,48 @@ def send_all(conn, dialect, delay: float) -> tuple[int, int]:
     return sent, skipped
 
 
+#: Home / EKF origin for the synthetic flight, over San Francisco.
+_HOME_LAT, _HOME_LON, _HOME_ALT_MM = 37.7749, -122.4194, 100_000
+
+
 def send_telemetry(conn, duration: float, rate: float) -> int:
-    """Stream a realistic telemetry loop for ``duration`` seconds."""
+    """Stream a realistic telemetry loop for ``duration`` seconds.
+
+    Emits everything the README's quick-start layout needs: a fused pose (from
+    LOCAL_POSITION_NED + ATTITUDE), a global fix, home and EKF origin, and
+    altitude.
+    """
     sent = 0
     period = 1.0 / rate
     start = time.time()
+
+    # Home and EKF origin are sent once up front, as a real vehicle does.
+    conn.mav.home_position_send(
+        int(_HOME_LAT * 1e7), int(_HOME_LON * 1e7), _HOME_ALT_MM,
+        0.0, 0.0, 0.0, [1.0, 0.0, 0.0, 0.0], 0.0, 0.0, 0.0, 0,
+    )
+    conn.mav.gps_global_origin_send(
+        int(_HOME_LAT * 1e7), int(_HOME_LON * 1e7), _HOME_ALT_MM, 0
+    )
+    sent += 2
+
     while time.time() - start < duration:
         t = time.time() - start
         boot_ms = int(t * 1000)
+
+        # A 20m circle at 15m altitude, expressed in NED relative to the EKF
+        # origin -- this is what drives the 3D panel.
+        north = 20.0 * math.cos(t * 0.5)
+        east = 20.0 * math.sin(t * 0.5)
+        down = -15.0
+        conn.mav.local_position_ned_send(
+            boot_ms, north, east, down,
+            -10.0 * math.sin(t * 0.5), 10.0 * math.cos(t * 0.5), 0.0,
+        )
+        conn.mav.altitude_send(
+            int(t * 1e6), 15.0, 115.0, 15.0, 15.0, 15.0, 15.0
+        )
+        sent += 2
 
         conn.mav.heartbeat_send(
             mavutil.mavlink.MAV_TYPE_QUADROTOR,
@@ -116,25 +150,29 @@ def send_telemetry(conn, duration: float, rate: float) -> int:
         )
         conn.mav.attitude_send(
             boot_ms,
-            0.2 * math.sin(t),          # roll
-            0.1 * math.cos(t),          # pitch
-            (t * 0.3) % (2 * math.pi),  # yaw
+            0.2 * math.sin(t),  # roll
+            0.1 * math.cos(t),  # pitch
+            # Yaw tracks the direction of travel around the circle.
+            (t * 0.5 + math.pi / 2) % (2 * math.pi),
             0.0, 0.0, 0.0,
         )
-        # A slow circle over San Francisco so the Map panel shows motion.
+        # The same circle in global coordinates, so the Map panel shows motion.
+        # ~1e-5 degrees of latitude is about 1.1 m.
         conn.mav.global_position_int_send(
             boot_ms,
-            int((37.7749 + 0.001 * math.sin(t * 0.5)) * 1e7),
-            int((-122.4194 + 0.001 * math.cos(t * 0.5)) * 1e7),
-            int(100_000 + 1000 * math.sin(t)),  # alt (mm, AMSL)
-            int(50_000),                        # relative_alt (mm)
+            int((_HOME_LAT + north * 9e-6) * 1e7),
+            int((_HOME_LON + east * 1.1e-5) * 1e7),
+            int(_HOME_ALT_MM + 15_000),  # alt (mm, AMSL)
+            int(15_000),                 # relative_alt (mm)
             100, 0, 0,
-            int((t * 10) % 360 * 100),
+            int(((t * 28.6) % 360) * 100),
         )
         conn.mav.gps_raw_int_send(
             int(t * 1e6),
             3,  # GPS_FIX_TYPE_3D_FIX -- exercises the enum companion field
-            int(37.7749 * 1e7), int(-122.4194 * 1e7), int(100_000),
+            int((_HOME_LAT + north * 9e-6) * 1e7),
+            int((_HOME_LON + east * 1.1e-5) * 1e7),
+            int(_HOME_ALT_MM + 15_000),
             100, 100, 500, 0, 12,
         )
         conn.mav.sys_status_send(
@@ -144,7 +182,7 @@ def send_telemetry(conn, duration: float, rate: float) -> int:
             mavutil.mavlink.MAV_SEVERITY_INFO,
             f"synthetic telemetry t={t:.1f}s".encode(),
         )
-        sent += 6
+        sent += 6  # heartbeat, attitude, global position, gps, sys_status, statustext
         time.sleep(period)
     return sent
 

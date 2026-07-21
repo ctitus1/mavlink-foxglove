@@ -43,6 +43,17 @@ def test_enum_companion_field(common):
     assert schema["properties"]["fix_type_enum"]["type"] == ["string", "null"]
 
 
+def test_bitmask_field_gets_an_array_companion(common):
+    """Bitmask fields need a list of flags, not a single symbolic name."""
+    schema = message_schema(common.MAVLink_heartbeat_message)
+    assert "base_mode_enum" not in schema["properties"]
+    flags = schema["properties"]["base_mode_flags"]
+    assert flags["type"] == "array"
+    assert flags["items"]["type"] == "string"
+    # Non-bitmask enum fields in the same message keep the singular form.
+    assert schema["properties"]["system_status_enum"]["type"] == ["string", "null"]
+
+
 def test_enum_companion_can_be_disabled(common):
     schema = message_schema(common.MAVLink_gps_raw_int_message, enum_names=False)
     assert "fix_type_enum" not in schema["properties"]

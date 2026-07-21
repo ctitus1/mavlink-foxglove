@@ -147,6 +147,7 @@ def message_schema(msg_class: type, enum_names: bool = True) -> dict[str, Any]:
     """
     units = getattr(msg_class, "fieldunits_by_name", {}) or {}
     enums = getattr(msg_class, "fieldenums_by_name", {}) or {}
+    displays = getattr(msg_class, "fielddisplays_by_name", {}) or {}
 
     properties: dict[str, Any] = {META_KEY: _META_SCHEMA}
     for name, mav_type, length in field_specs(msg_class):
@@ -154,10 +155,20 @@ def message_schema(msg_class: type, enum_names: bool = True) -> dict[str, Any]:
         properties[name] = field_schema(mav_type, length, units.get(name), enum)
 
         if enum_names and enum:
-            properties[f"{name}_enum"] = {
-                "type": ["string", "null"],
-                "description": f"Symbolic name of {name} from enum {enum}.",
-            }
+            if displays.get(name) == "bitmask":
+                # A bitmask holds several flags at once, so a single symbolic
+                # name cannot represent it: MAV_MODE_FLAG value 209 is not any
+                # one entry. Decode to the list of flags that are set.
+                properties[f"{name}_flags"] = {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": f"Flags set in {name}, from bitmask {enum}.",
+                }
+            else:
+                properties[f"{name}_enum"] = {
+                    "type": ["string", "null"],
+                    "description": f"Symbolic name of {name} from enum {enum}.",
+                }
 
     return {
         "type": "object",

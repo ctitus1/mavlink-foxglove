@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import math
 import socket
 import struct
 
@@ -214,6 +215,67 @@ async def test_derived_topics_are_published(ports):
                 payload, json.loads(by_topic["/mavlink/1/1/location"]["schema"])
             )
             assert payload["latitude"] == pytest.approx(37.7749, abs=1e-5)
+    finally:
+        task.cancel()
+        conn.close()
+
+
+@pytest.mark.asyncio
+async def test_pose_fuses_position_and_orientation_end_to_end(ports):
+    """The 3D panel's transform must carry both halves through the live bridge."""
+    config = Config(
+        mavlink_url=f"udpin:127.0.0.1:{ports['udp']}",
+        ws_host="127.0.0.1",
+        ws_port=ports["ws"],
+        send_heartbeat=False,
+    )
+    task = await _run_bridge(config)
+    conn = _sender(ports["udp"])
+
+    try:
+        async with FoxgloveTestClient(f"ws://127.0.0.1:{ports['ws']}") as client:
+
+            async def keep_sending() -> None:
+                while True:
+                    # 10m North, 5m East, 3m Down; heading due East.
+                    conn.mav.local_position_ned_send(
+                        1000, 10.0, 5.0, -3.0, 0.0, 0.0, 0.0
+                    )
+                    conn.mav.attitude_send(
+                        1000, 0.0, 0.0, math.pi / 2, 0.0, 0.0, 0.0
+                    )
+                    await asyncio.sleep(0.1)
+
+            pump = asyncio.ensure_future(keep_sending())
+            try:
+                wanted = {"/mavlink/1/1/pose"}
+                await client.collect_advertisements(wanted, timeout=10.0)
+                mapping = await client.subscribe(wanted)
+                messages = await client.collect_messages(6, timeout=10.0)
+            finally:
+                pump.cancel()
+
+            by_topic = {c["topic"]: c for c in client.channels.values()}
+            assert by_topic["/mavlink/1/1/pose"]["schemaName"] == "foxglove.FrameTransform"
+
+            # Find a transform published after both halves have been seen.
+            fused = [
+                p for _s, p in messages
+                if p["translation"] != {"x": 0.0, "y": 0.0, "z": 0.0}
+            ]
+            assert fused, "pose never carried a non-origin translation"
+            payload = fused[-1]
+            jsonschema.validate(payload, json.loads(by_topic["/mavlink/1/1/pose"]["schema"]))
+
+            # NED (10 N, 5 E, -3 D) -> ENU (x=5 E, y=10 N, z=3 U).
+            assert payload["translation"]["x"] == pytest.approx(5.0, abs=1e-4)
+            assert payload["translation"]["y"] == pytest.approx(10.0, abs=1e-4)
+            assert payload["translation"]["z"] == pytest.approx(3.0, abs=1e-4)
+            assert payload["parent_frame_id"] == "map"
+            assert payload["child_frame_id"] == "base_link"
+
+            # Heading East in NED is identity yaw in ENU.
+            assert payload["rotation"]["w"] == pytest.approx(1.0, abs=1e-4)
     finally:
         task.cancel()
         conn.close()

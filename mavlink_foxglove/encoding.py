@@ -64,6 +64,24 @@ def enum_label(dialect: ModuleType, enum_name: str, value: Any) -> str | None:
     return getattr(entry, "name", None) if entry is not None else None
 
 
+def flag_labels(dialect: ModuleType, enum_name: str, value: Any) -> list[str]:
+    """Decode a bitmask into the symbolic names of the flags that are set.
+
+    A bitmask field holds several flags at once, so :func:`enum_label` cannot
+    describe it -- MAV_MODE_FLAG value 209 matches no single entry. Bits with no
+    known flag are ignored rather than guessed at.
+    """
+    entries = dialect.enums.get(enum_name)
+    if not entries or not isinstance(value, int) or isinstance(value, bool):
+        return []
+    return [
+        entry.name
+        for bit, entry in sorted(entries.items())
+        # Enum tables include a synthetic ENUM_END sentinel that is not a flag.
+        if isinstance(bit, int) and bit > 0 and bit & (bit - 1) == 0 and value & bit
+    ]
+
+
 def encode_message(
     msg: Any,
     dialect: ModuleType,
@@ -77,6 +95,7 @@ def encode_message(
     """
     msg_class = type(msg)
     enums = getattr(msg_class, "fieldenums_by_name", {}) or {}
+    displays = getattr(msg_class, "fielddisplays_by_name", {}) or {}
 
     out: dict[str, Any] = {
         META_KEY: {
@@ -95,7 +114,10 @@ def encode_message(
         raw = getattr(msg, name, None)
         out[name] = sanitize(raw)
         if enum_names and name in enums:
-            out[f"{name}_enum"] = enum_label(dialect, enums[name], raw)
+            if displays.get(name) == "bitmask":
+                out[f"{name}_flags"] = flag_labels(dialect, enums[name], raw)
+            else:
+                out[f"{name}_enum"] = enum_label(dialect, enums[name], raw)
 
     return out
 
