@@ -28,18 +28,26 @@
         "timestampMethod": "receiveTime"
       }
     },
-    "Map!px4_map": {
-      "center": null,
+    "map!2dtxlgi": {
       "customTileUrl": "",
       "disabledTopics": [],
-      "followTopic": "/mavlink/1/1/location",
-      "layer": "map",
-      "topicColors": {
-        "/mavlink/1/1/home_location": "#e15759"
-      },
-      "zoomLevel": 18,
+      "followTopic": "/mavlink/1/1/gps_location",
+      "followFrame": "wgs84",
+      "layer": "satellite",
+      "topicColors": {},
+      "zoomLevel": 10,
       "maxNativeZoom": 18,
-      "foxglovePanelTitle": "Position (Map)"
+      "topicConfig": {
+        "/mavlink/1/1/gps_location": {
+          "historyMode": "none",
+          "pointSize": 6
+        },
+        "/mavlink/1/1/location": {
+          "historyMode": "none",
+          "pointSize": 6
+        }
+      },
+      "layers": []
     },
     "Plot!px4_altitude": {
       "paths": [
@@ -256,6 +264,52 @@
       "maxYValue": null,
       "followingViewWidth": null
     },
+    "Plot!px4_pitch_angle": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/ATTITUDE.pitch",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Pitch Estimated",
+          "color": "#4e79a7"
+        }
+      ],
+      "foxglovePanelTitle": "Pitch Angle [rad]",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": null,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!px4_yaw_angle": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/ATTITUDE.yaw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Yaw Estimated",
+          "color": "#4e79a7"
+        }
+      ],
+      "foxglovePanelTitle": "Yaw Angle [rad]",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": null,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
     "Plot!px4_roll_rate": {
       "paths": [
         {
@@ -274,29 +328,6 @@
         }
       ],
       "foxglovePanelTitle": "Roll Angular Rate [rad/s]",
-      "showLegend": true,
-      "legendDisplay": "floating",
-      "showPlotValuesInLegend": true,
-      "showXAxisLabels": true,
-      "showYAxisLabels": true,
-      "isSynced": true,
-      "xAxisVal": "timestamp",
-      "sidebarDimension": 240,
-      "minYValue": null,
-      "maxYValue": null,
-      "followingViewWidth": null
-    },
-    "Plot!px4_pitch_angle": {
-      "paths": [
-        {
-          "value": "/mavlink/1/1/ATTITUDE.pitch",
-          "enabled": true,
-          "timestampMethod": "receiveTime",
-          "label": "Pitch Estimated",
-          "color": "#4e79a7"
-        }
-      ],
-      "foxglovePanelTitle": "Pitch Angle [rad]",
       "showLegend": true,
       "legendDisplay": "floating",
       "showPlotValuesInLegend": true,
@@ -339,29 +370,6 @@
       "maxYValue": null,
       "followingViewWidth": null
     },
-    "Plot!px4_yaw_angle": {
-      "paths": [
-        {
-          "value": "/mavlink/1/1/ATTITUDE.yaw",
-          "enabled": true,
-          "timestampMethod": "receiveTime",
-          "label": "Yaw Estimated",
-          "color": "#4e79a7"
-        }
-      ],
-      "foxglovePanelTitle": "Yaw Angle [rad]",
-      "showLegend": true,
-      "legendDisplay": "floating",
-      "showPlotValuesInLegend": true,
-      "showXAxisLabels": true,
-      "showYAxisLabels": true,
-      "isSynced": true,
-      "xAxisVal": "timestamp",
-      "sidebarDimension": 240,
-      "minYValue": null,
-      "maxYValue": null,
-      "followingViewWidth": null
-    },
     "Plot!px4_yaw_rate": {
       "paths": [
         {
@@ -392,61 +400,38 @@
       "maxYValue": null,
       "followingViewWidth": null
     },
-    "Plot!px4_airspeed": {
+    "Plot!px4_actuator_controls": {
       "paths": [
         {
-          "value": "/mavlink/1/1/VFR_HUD.groundspeed",
+          "value": "/mavlink/1/1/ATTITUDE_TARGET.body_roll_rate",
           "enabled": true,
           "timestampMethod": "receiveTime",
-          "label": "Ground Speed Estimated",
+          "label": "Roll",
           "color": "#4e79a7"
         },
         {
-          "value": "/mavlink/1/1/VFR_HUD.airspeed",
+          "value": "/mavlink/1/1/ATTITUDE_TARGET.body_pitch_rate",
           "enabled": true,
           "timestampMethod": "receiveTime",
-          "label": "True Airspeed",
-          "color": "#f28e2c"
-        }
-      ],
-      "foxglovePanelTitle": "Airspeed [m/s]",
-      "showLegend": true,
-      "legendDisplay": "floating",
-      "showPlotValuesInLegend": true,
-      "showXAxisLabels": true,
-      "showYAxisLabels": true,
-      "isSynced": true,
-      "xAxisVal": "timestamp",
-      "sidebarDimension": 240,
-      "minYValue": null,
-      "maxYValue": null,
-      "followingViewWidth": null
-    },
-    "Plot!px4_tecs": {
-      "paths": [
-        {
-          "value": "/mavlink/1/1/VFR_HUD.climb",
-          "enabled": true,
-          "timestampMethod": "receiveTime",
-          "label": "Height Rate",
-          "color": "#4e79a7"
-        },
-        {
-          "value": "/mavlink/1/1/NAV_CONTROLLER_OUTPUT.alt_error",
-          "enabled": true,
-          "timestampMethod": "receiveTime",
-          "label": "Altitude Error",
+          "label": "Pitch",
           "color": "#f28e2c"
         },
         {
-          "value": "/mavlink/1/1/NAV_CONTROLLER_OUTPUT.aspd_error",
+          "value": "/mavlink/1/1/ATTITUDE_TARGET.body_yaw_rate",
           "enabled": true,
           "timestampMethod": "receiveTime",
-          "label": "Airspeed Error",
+          "label": "Yaw",
           "color": "#e15759"
+        },
+        {
+          "value": "/mavlink/1/1/ATTITUDE_TARGET.thrust",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Thrust (up)",
+          "color": "#76b7b2"
         }
       ],
-      "foxglovePanelTitle": "TECS [m/s]",
+      "foxglovePanelTitle": "Actuator Controls",
       "showLegend": true,
       "legendDisplay": "floating",
       "showPlotValuesInLegend": true,
@@ -603,38 +588,61 @@
       "maxYValue": null,
       "followingViewWidth": null
     },
-    "Plot!px4_actuator_controls": {
+    "Plot!px4_airspeed": {
       "paths": [
         {
-          "value": "/mavlink/1/1/ATTITUDE_TARGET.body_roll_rate",
+          "value": "/mavlink/1/1/VFR_HUD.groundspeed",
           "enabled": true,
           "timestampMethod": "receiveTime",
-          "label": "Roll",
+          "label": "Ground Speed Estimated",
           "color": "#4e79a7"
         },
         {
-          "value": "/mavlink/1/1/ATTITUDE_TARGET.body_pitch_rate",
+          "value": "/mavlink/1/1/VFR_HUD.airspeed",
           "enabled": true,
           "timestampMethod": "receiveTime",
-          "label": "Pitch",
+          "label": "True Airspeed",
+          "color": "#f28e2c"
+        }
+      ],
+      "foxglovePanelTitle": "Airspeed [m/s]",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": null,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!px4_tecs": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/VFR_HUD.climb",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Height Rate",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/NAV_CONTROLLER_OUTPUT.alt_error",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Altitude Error",
           "color": "#f28e2c"
         },
         {
-          "value": "/mavlink/1/1/ATTITUDE_TARGET.body_yaw_rate",
+          "value": "/mavlink/1/1/NAV_CONTROLLER_OUTPUT.aspd_error",
           "enabled": true,
           "timestampMethod": "receiveTime",
-          "label": "Yaw",
+          "label": "Airspeed Error",
           "color": "#e15759"
-        },
-        {
-          "value": "/mavlink/1/1/ATTITUDE_TARGET.thrust",
-          "enabled": true,
-          "timestampMethod": "receiveTime",
-          "label": "Thrust (up)",
-          "color": "#76b7b2"
         }
       ],
-      "foxglovePanelTitle": "Actuator Controls",
+      "foxglovePanelTitle": "TECS [m/s]",
       "showLegend": true,
       "legendDisplay": "floating",
       "showPlotValuesInLegend": true,
@@ -1182,11 +1190,17 @@
       "isSynced": true,
       "foxglovePanelTitle": "Failsafe & Status Flags"
     },
-    "Log!px4_messages": {
-      "topicToRender": "/mavlink/1/1/log",
+    "RosOut!ce4sq2": {
       "minLogLevel": 1,
       "searchTerms": [],
-      "foxglovePanelTitle": "Logged Messages"
+      "nameFilter": {},
+      "fontSize": 12,
+      "showLevel": true,
+      "showDate": true,
+      "showTime": true,
+      "showTimezone": true,
+      "showName": true,
+      "showSourceLocation": false
     },
     "Tab!px4_flight_review": {
       "activeTabIdx": 0,
@@ -1198,11 +1212,11 @@
             "first": {
               "direction": "row",
               "first": "Plot!px4_position_xy",
-              "second": "Map!px4_map",
-              "splitPercentage": 50.0
+              "second": "map!2dtxlgi",
+              "splitPercentage": 50
             },
             "second": "Plot!px4_altitude",
-            "splitPercentage": 50.0
+            "splitPercentage": 50
           }
         },
         {
@@ -1213,15 +1227,15 @@
               "direction": "row",
               "first": "Plot!px4_local_x",
               "second": "Plot!px4_local_y",
-              "splitPercentage": 50.0
+              "splitPercentage": 50
             },
             "second": {
               "direction": "row",
               "first": "Plot!px4_local_z",
               "second": "Plot!px4_velocity",
-              "splitPercentage": 50.0
+              "splitPercentage": 50
             },
-            "splitPercentage": 50.0
+            "splitPercentage": 50
           }
         },
         {
@@ -1232,7 +1246,7 @@
               "direction": "row",
               "first": "Plot!px4_roll_angle",
               "second": "Plot!px4_pitch_angle",
-              "splitPercentage": 50.0
+              "splitPercentage": 50
             },
             "second": {
               "direction": "column",
@@ -1240,15 +1254,15 @@
                 "direction": "row",
                 "first": "Plot!px4_yaw_angle",
                 "second": "Plot!px4_roll_rate",
-                "splitPercentage": 50.0
+                "splitPercentage": 50
               },
               "second": {
                 "direction": "row",
                 "first": "Plot!px4_pitch_rate",
                 "second": "Plot!px4_yaw_rate",
-                "splitPercentage": 50.0
+                "splitPercentage": 50
               },
-              "splitPercentage": 50.0
+              "splitPercentage": 50
             },
             "splitPercentage": 33.333333333333336
           }
@@ -1261,7 +1275,7 @@
               "direction": "row",
               "first": "Plot!px4_actuator_controls",
               "second": "Plot!px4_rc_inputs",
-              "splitPercentage": 50.0
+              "splitPercentage": 50
             },
             "second": {
               "direction": "column",
@@ -1269,10 +1283,10 @@
                 "direction": "row",
                 "first": "Plot!px4_actuator_outputs",
                 "second": "Plot!px4_airspeed",
-                "splitPercentage": 50.0
+                "splitPercentage": 50
               },
               "second": "Plot!px4_tecs",
-              "splitPercentage": 50.0
+              "splitPercentage": 50
             },
             "splitPercentage": 33.333333333333336
           }
@@ -1285,7 +1299,7 @@
               "direction": "row",
               "first": "Plot!px4_raw_accel",
               "second": "Plot!px4_raw_gyro",
-              "splitPercentage": 50.0
+              "splitPercentage": 50
             },
             "second": {
               "direction": "column",
@@ -1293,15 +1307,15 @@
                 "direction": "row",
                 "first": "Plot!px4_raw_mag",
                 "second": "Plot!px4_vibration",
-                "splitPercentage": 50.0
+                "splitPercentage": 50
               },
               "second": {
                 "direction": "row",
                 "first": "Plot!px4_distance_sensor",
                 "second": "Plot!px4_temperature",
-                "splitPercentage": 50.0
+                "splitPercentage": 50
               },
-              "splitPercentage": 50.0
+              "splitPercentage": 50
             },
             "splitPercentage": 33.333333333333336
           }
@@ -1314,10 +1328,10 @@
               "direction": "row",
               "first": "Plot!px4_gps_uncertainty",
               "second": "Plot!px4_estimator",
-              "splitPercentage": 50.0
+              "splitPercentage": 50
             },
             "second": "Plot!px4_estimator_accuracy",
-            "splitPercentage": 50.0
+            "splitPercentage": 50
           }
         },
         {
@@ -1328,7 +1342,7 @@
               "direction": "row",
               "first": "Plot!px4_power",
               "second": "Plot!px4_cpu",
-              "splitPercentage": 50.0
+              "splitPercentage": 50
             },
             "second": {
               "direction": "column",
@@ -1336,10 +1350,10 @@
                 "direction": "row",
                 "first": "Plot!px4_telemetry",
                 "second": "StateTransitions!px4_flags",
-                "splitPercentage": 50.0
+                "splitPercentage": 50
               },
-              "second": "Log!px4_messages",
-              "splitPercentage": 50.0
+              "second": "RosOut!ce4sq2",
+              "splitPercentage": 50
             },
             "splitPercentage": 33.333333333333336
           }

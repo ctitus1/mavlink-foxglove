@@ -32,7 +32,7 @@
         "enableStats": false,
         "transforms": {
           "showLabel": true,
-          "axisScale": 2
+          "axisSize": 0.4
         }
       },
       "transforms": {
@@ -81,22 +81,30 @@
         "poseEstimateYDeviation": 0.5,
         "poseEstimateThetaDeviation": 0.26179939
       },
-      "foxglovePanelTitle": "3D Viewer"
+      "foxglovePanelTitle": "3D Viewer",
+      "synchronize": false,
+      "imageMode": {}
     },
-    "Map!apm_map": {
-      "center": null,
+    "map!4j2gknq": {
       "customTileUrl": "",
       "disabledTopics": [],
-      "followTopic": "/mavlink/1/1/location",
-      "layer": "map",
-      "topicColors": {
-        "/mavlink/1/1/home_location": "#e15759",
-        "/mavlink/1/1/gps_location": "#4e79a7",
-        "/mavlink/1/1/ekf_origin_location": "#59a14f"
-      },
-      "zoomLevel": 18,
+      "followTopic": "",
+      "followFrame": "",
+      "layer": "satellite",
+      "topicColors": {},
+      "zoomLevel": 10,
       "maxNativeZoom": 18,
-      "foxglovePanelTitle": "Flight Track"
+      "topicConfig": {
+        "/mavlink/1/1/gps_location": {
+          "historyMode": "none",
+          "pointSize": 6
+        },
+        "/mavlink/1/1/location": {
+          "historyMode": "none",
+          "pointSize": 6
+        }
+      },
+      "layers": []
     },
     "Plot!apm_ground_track": {
       "paths": [
@@ -147,32 +155,6 @@
       "isSynced": true,
       "foxglovePanelTitle": "Flight Modes"
     },
-    "Gauge!apm_attitude_roll": {
-      "path": "/mavlink/1/1/ATTITUDE.roll",
-      "minValue": -3.15,
-      "maxValue": 3.15,
-      "colorMode": "colormap",
-      "colorMap": "rainbow",
-      "gradient": [
-        "#0000ff",
-        "#ff00ff"
-      ],
-      "reverse": false,
-      "foxglovePanelTitle": "Attitude \u2014 Roll [rad]"
-    },
-    "Gauge!apm_attitude_pitch": {
-      "path": "/mavlink/1/1/ATTITUDE.pitch",
-      "minValue": -1.58,
-      "maxValue": 1.58,
-      "colorMode": "colormap",
-      "colorMap": "rainbow",
-      "gradient": [
-        "#0000ff",
-        "#ff00ff"
-      ],
-      "reverse": false,
-      "foxglovePanelTitle": "Attitude \u2014 Pitch [rad]"
-    },
     "Plot!apm_attitude": {
       "paths": [
         {
@@ -209,6 +191,40 @@
       "minYValue": null,
       "maxYValue": null,
       "followingViewWidth": null
+    },
+    "Gauge!apm_attitude_roll": {
+      "path": "/mavlink/1/1/ATTITUDE.roll",
+      "minValue": -3.15,
+      "maxValue": 3.15,
+      "colorMode": "colormap",
+      "colorMap": "rainbow",
+      "gradient": [
+        "#0000ff",
+        "#ff00ff"
+      ],
+      "reverse": false,
+      "foxglovePanelTitle": "Attitude — Roll [rad]",
+      "style": "dial",
+      "tickInterval": 0.1,
+      "showTicks": false,
+      "reverseDirection": false
+    },
+    "Gauge!apm_attitude_pitch": {
+      "path": "/mavlink/1/1/ATTITUDE.pitch",
+      "minValue": -1.58,
+      "maxValue": 1.58,
+      "colorMode": "colormap",
+      "colorMap": "rainbow",
+      "gradient": [
+        "#0000ff",
+        "#ff00ff"
+      ],
+      "reverse": false,
+      "foxglovePanelTitle": "Attitude — Pitch [rad]",
+      "style": "dial",
+      "tickInterval": 0.1,
+      "showTicks": false,
+      "reverseDirection": false
     },
     "Plot!apm_radio_sticks": {
       "paths": [
@@ -353,7 +369,7 @@
           "color": "#edc949"
         }
       ],
-      "foxglovePanelTitle": "EKF helper \u2014 Variances",
+      "foxglovePanelTitle": "EKF helper — Variances",
       "showLegend": true,
       "legendDisplay": "floating",
       "showPlotValuesInLegend": true,
@@ -375,13 +391,14 @@
         }
       ],
       "isSynced": true,
-      "foxglovePanelTitle": "EKF helper \u2014 Solution Status"
+      "foxglovePanelTitle": "EKF helper — Solution Status"
     },
     "RawMessages!apm_sensors": {
       "topicPath": "/mavlink/1/1/SYS_STATUS",
       "diffEnabled": false,
       "expansion": "all",
-      "foxglovePanelTitle": "Sensors \u2014 Health"
+      "foxglovePanelTitle": "Sensors — Health",
+      "defaultExpanded": false
     },
     "Plot!apm_magfit": {
       "paths": [
@@ -407,7 +424,7 @@
           "color": "#e15759"
         }
       ],
-      "foxglovePanelTitle": "Mag Fit Tool \u2014 Compass [mgauss]",
+      "foxglovePanelTitle": "Mag Fit Tool — Compass [mgauss]",
       "showLegend": true,
       "legendDisplay": "floating",
       "showPlotValuesInLegend": true,
@@ -451,7 +468,7 @@
           "color": "#76b7b2"
         }
       ],
-      "foxglovePanelTitle": "Mag Fit Tool \u2014 Calibration",
+      "foxglovePanelTitle": "Mag Fit Tool — Calibration",
       "showLegend": true,
       "legendDisplay": "floating",
       "showPlotValuesInLegend": true,
@@ -805,7 +822,7 @@
             "first": "3D!apm_cesium",
             "second": {
               "direction": "column",
-              "first": "Map!apm_map",
+              "first": "map!4j2gknq",
               "second": {
                 "direction": "column",
                 "first": "Plot!apm_ground_track",
@@ -829,15 +846,15 @@
                   "direction": "row",
                   "first": "Plot!apm_attitude",
                   "second": "Gauge!apm_attitude_roll",
-                  "splitPercentage": 50.0
+                  "splitPercentage": 50
                 },
                 "second": {
                   "direction": "row",
                   "first": "Gauge!apm_attitude_pitch",
                   "second": "Plot!apm_radio_sticks",
-                  "splitPercentage": 50.0
+                  "splitPercentage": 50
                 },
-                "splitPercentage": 50.0
+                "splitPercentage": 50
               },
               "second": {
                 "direction": "row",
@@ -845,17 +862,17 @@
                   "direction": "row",
                   "first": "Plot!apm_radio_aux",
                   "second": "Table!apm_parameters",
-                  "splitPercentage": 50.0
+                  "splitPercentage": 50
                 },
                 "second": {
                   "direction": "row",
                   "first": "Log!apm_messages",
                   "second": "Plot!apm_ekf_variances",
-                  "splitPercentage": 50.0
+                  "splitPercentage": 50
                 },
-                "splitPercentage": 50.0
+                "splitPercentage": 50
               },
-              "splitPercentage": 50.0
+              "splitPercentage": 50
             },
             "second": {
               "direction": "column",
@@ -865,15 +882,15 @@
                   "direction": "row",
                   "first": "StateTransitions!apm_ekf_flags",
                   "second": "RawMessages!apm_sensors",
-                  "splitPercentage": 50.0
+                  "splitPercentage": 50
                 },
                 "second": {
                   "direction": "row",
                   "first": "Plot!apm_magfit",
                   "second": "Plot!apm_magfit_report",
-                  "splitPercentage": 50.0
+                  "splitPercentage": 50
                 },
-                "splitPercentage": 50.0
+                "splitPercentage": 50
               },
               "second": {
                 "direction": "column",
@@ -883,15 +900,15 @@
                     "direction": "row",
                     "first": "Plot!apm_vibration",
                     "second": "Plot!apm_clipping",
-                    "splitPercentage": 50.0
+                    "splitPercentage": 50
                   },
                   "second": {
                     "direction": "row",
                     "first": "Plot!apm_power",
                     "second": "Plot!apm_board_power",
-                    "splitPercentage": 50.0
+                    "splitPercentage": 50
                   },
-                  "splitPercentage": 50.0
+                  "splitPercentage": 50
                 },
                 "second": {
                   "direction": "row",
@@ -899,21 +916,21 @@
                     "direction": "row",
                     "first": "Plot!apm_speed",
                     "second": "Plot!apm_servos",
-                    "splitPercentage": 50.0
+                    "splitPercentage": 50
                   },
                   "second": {
                     "direction": "row",
                     "first": "Plot!apm_gps_accuracy",
                     "second": "Plot!apm_rangefinder",
-                    "splitPercentage": 50.0
+                    "splitPercentage": 50
                   },
-                  "splitPercentage": 50.0
+                  "splitPercentage": 50
                 },
-                "splitPercentage": 50.0
+                "splitPercentage": 50
               },
               "splitPercentage": 33.333333333333336
             },
-            "splitPercentage": 40.0
+            "splitPercentage": 40
           }
         }
       ]
