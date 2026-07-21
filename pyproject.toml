@@ -1,5 +1,6 @@
 [build-system]
-requires = ["setuptools>=68"]
+# >=77 for PEP 639 SPDX `license` / `license-files` support.
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,6 +9,14 @@ version = "0.1.0"
 description = "Expose every MAVLink message as a Foxglove WebSocket channel"
 readme = "README.md"
 requires-python = ">=3.9"
+# SPDX expression, per PEP 639. A `{ text = ... }` table and the matching
+# "License :: OSI Approved" classifier are both deprecated by setuptools.
+license = "MIT"
+license-files = ["LICENSE"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+]
 dependencies = [
     "pymavlink>=2.4.40",
     "foxglove-websocket>=0.1.2",

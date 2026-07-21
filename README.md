@@ -1,5 +1,8 @@
 # mavlink-foxglove
 
+[![CI](https://github.com/ctitus1/mavlink-foxglove/actions/workflows/ci.yml/badge.svg)](https://github.com/ctitus1/mavlink-foxglove/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A Docker container that listens for MAVLink telemetry and exposes **every**
 MAVLink message as a live [Foxglove](https://foxglove.dev) topic — the same role
 `foxglove_bridge` plays for ROS.
@@ -252,6 +255,30 @@ Both default to `udpout:127.0.0.1:14445`. `--mode all` deliberately includes
 NaN and infinite floats, non-ASCII bytes in char fields, and 64-bit values
 above 2^53.
 
+### Smoke-testing a running container
+
+The pytest suite runs the bridge in-process. To validate a *deployed* instance
+over its real network interfaces:
+
+```bash
+docker compose up -d
+python tools/smoke_test.py
+```
+
+It sends the full dialect, checks every advertised schema is a legal JSON
+Schema, validates live payloads against the schema advertised for their
+channel, and fails if any `NaN`/`Infinity` token reaches the wire. It exits
+non-zero on failure, which is how CI gates the image.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push and pull request:
+
+* **`test`** — the pytest suite on Python 3.9, 3.10, 3.11 and 3.12.
+* **`docker`** — builds the image, starts the container, runs
+  `tools/smoke_test.py` against it, and fails if the container logged any
+  error.
+
 ## Verified behaviour
 
 Against the running container, driven by the test publisher over host UDP:
@@ -278,3 +305,7 @@ Reproduce with `docker compose up -d`, then
 * **`_meta.receive_timestamp` is host receive time**, not vehicle time. Vehicle
   timestamps remain available in their original fields (`time_boot_ms`,
   `time_usec`).
+
+## License
+
+[MIT](LICENSE).
