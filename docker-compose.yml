@@ -1,0 +1,17 @@
+services:
+  mavlink-foxglove:
+    build: .
+    image: mavlink-foxglove:latest
+    container_name: mavlink-foxglove
+    restart: unless-stopped
+    ports:
+      # MAVLink telemetry in. Publishing on 127.0.0.1 keeps the port off other
+      # interfaces; drop the host prefix to accept traffic from the network.
+      - "127.0.0.1:14445:14445/udp"
+      # Foxglove WebSocket out -- open ws://localhost:8765 in Foxglove.
+      - "127.0.0.1:8765:8765"
+    environment:
+      MAVLINK_FOXGLOVE_MAVLINK_URL: "udpin:0.0.0.0:14445"
+      # px4 (default) | ardupilot | both | all
+      MAVLINK_FOXGLOVE_AUTOPILOT: "px4"
+      MAVLINK_FOXGLOVE_LOG_LEVEL: "INFO"

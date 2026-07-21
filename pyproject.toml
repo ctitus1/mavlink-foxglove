@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mavlink-foxglove"
+version = "0.1.0"
+description = "Expose every MAVLink message as a Foxglove WebSocket channel"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "pymavlink>=2.4.40",
+    "foxglove-websocket>=0.1.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-asyncio>=0.23",
+    "jsonschema>=4.0",
+]
+
+[project.scripts]
+mavlink-foxglove = "mavlink_foxglove.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["mavlink_foxglove*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+# ROS ships pytest plugins system-wide (e.g. under /opt/ros) that are
+# incompatible with modern pytest and irrelevant here. Disabling them keeps the
+# suite runnable on a developer machine that also has ROS installed.
+addopts = "-p no:launch_testing -p no:launch_ros"

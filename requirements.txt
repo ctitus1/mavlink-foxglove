@@ -1,0 +1,4 @@
+# Runtime dependencies. Versions are floors, not pins; the Docker image
+# resolves them at build time. Pin exactly here if you need reproducible builds.
+pymavlink>=2.4.40
+foxglove-websocket>=0.1.2
