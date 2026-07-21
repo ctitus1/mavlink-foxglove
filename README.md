@@ -215,6 +215,68 @@ The `map` frame is the vehicle's **EKF/local origin**, which for most flights is
 where it was armed. It is not a geographic datum; use the Map panel and
 `.../ekf_origin_location` to tie it to real coordinates.
 
+## Prebuilt layouts
+
+Two layouts in `layouts/` reproduce the two most familiar ArduPilot/PX4 log
+review tools. Import with **Layouts → Import from file…** in Foxglove.
+
+| File | Approximates | Structure |
+| --- | --- | --- |
+| `layouts/px4-flight-review.json` | [PX4 Flight Review](https://github.com/PX4/flight_review) | 7 tabs, 33 panels |
+| `layouts/ardupilot-log-viewer.json` | [ArduPilot UAV Log Viewer](https://github.com/ArduPilot/UAVLogViewer) | 2 tabs (3D / Widgets), 25 panels |
+
+Both assume system/component `1/1`. If your vehicle differs, edit the `V`
+constant in the matching generator and regenerate:
+
+```bash
+cd tools/layouts
+python3 px4_flight_review.py
+python3 ardupilot_log_viewer.py
+```
+
+The layouts are generated rather than hand-written, because a few thousand lines
+of hand-maintained JSON rots the moment a topic name changes.
+`tools/layouts/_builder.py` holds the panel constructors.
+
+### What these are, and what they are not
+
+Both upstream tools read **log files** — PX4 Flight Review plots uLog uORB
+topics (`vehicle_attitude`, `sensor_combined`), and the UAV Log Viewer plots
+ArduPilot dataflash messages (`ATT`, `VIBE`, `RCIN`). This bridge carries
+**MAVLink**, which is a different and considerably smaller set of data. So these
+layouts reproduce each tool's plot titles, units and legend labels over the
+closest MAVLink equivalent. They are a familiar arrangement of live telemetry,
+not a reimplementation of either tool.
+
+Two systematic differences apply to the PX4 layout:
+
+* **Angles are radians, not degrees.** Flight Review converts uLog radians to
+  degrees; MAVLink's `ATTITUDE` already carries radians and Foxglove message
+  paths have no arithmetic, so no conversion is possible. Titles say `[rad]`.
+* **Some fields are scaled integers.** Battery voltage is mV, current cA, and
+  several temperatures centi-degrees. Legends name the real unit.
+
+Not reproduced, because no MAVLink message carries the data: all FFT and
+power-spectral-density plots, FIFO sensor plots, sampling regularity, visual
+odometry, CPU/RAM (`cpuload`), and GPS noise/jamming.
+
+For the ArduPilot layout, five of the seven sidebar widgets map cleanly
+(Parameters, Radio Sticks, EKF helper, Messages, Sensors). Two do not and are
+approximated:
+
+* **Attitude** is an artificial-horizon instrument; Foxglove has no such panel,
+  so it uses the 3D pose plus roll/pitch gauges.
+* **Mag Fit Tool** runs a genetic optimiser to propose compass offsets — a
+  computation, not a view. The layout shows raw compass axes and ArduPilot's
+  own `MAG_CAL_REPORT` fitness and offsets instead.
+
+The ArduPilot layout needs `--autopilot ardupilot`: `EKF_STATUS_REPORT`,
+`MEMINFO`, `RANGEFINDER`, `WIND` and `MAG_CAL_REPORT` do not exist in `common`.
+
+These layouts have **not** been opened in Foxglove and verified end-to-end —
+they are structurally checked (no duplicate or dangling panel IDs) but visually
+unproven.
+
 ## Configuration
 
 Every option is available as a CLI flag and as an environment variable prefixed

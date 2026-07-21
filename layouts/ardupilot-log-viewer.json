@@ -1,0 +1,928 @@
+{
+  "configById": {
+    "3D!apm_cesium": {
+      "cameraState": {
+        "distance": 60,
+        "perspective": true,
+        "phi": 55,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 45,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "followTf": "map",
+      "scene": {
+        "enableStats": false,
+        "transforms": {
+          "showLabel": true,
+          "axisScale": 2
+        }
+      },
+      "transforms": {
+        "frame:map": {
+          "visible": true
+        },
+        "frame:base_link": {
+          "visible": true
+        }
+      },
+      "topics": {
+        "/mavlink/1/1/pose": {
+          "visible": true
+        }
+      },
+      "layers": {
+        "grid": {
+          "layerId": "foxglove.Grid",
+          "instanceId": "grid",
+          "label": "Grid",
+          "visible": true,
+          "frameId": "map",
+          "size": 200,
+          "divisions": 40,
+          "lineWidth": 1,
+          "color": "#7a7a7a60",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "order": 1
+        }
+      },
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "foxglovePanelTitle": "3D Viewer"
+    },
+    "Map!apm_map": {
+      "center": null,
+      "customTileUrl": "",
+      "disabledTopics": [],
+      "followTopic": "/mavlink/1/1/location",
+      "layer": "map",
+      "topicColors": {
+        "/mavlink/1/1/home_location": "#e15759",
+        "/mavlink/1/1/gps_location": "#4e79a7",
+        "/mavlink/1/1/ekf_origin_location": "#59a14f"
+      },
+      "zoomLevel": 18,
+      "maxNativeZoom": 18,
+      "foxglovePanelTitle": "Flight Track"
+    },
+    "Plot!apm_ground_track": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/LOCAL_POSITION_NED.x",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Position",
+          "color": "#4e79a7"
+        }
+      ],
+      "foxglovePanelTitle": "Ground Track [m]",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": false,
+      "xAxisVal": "custom",
+      "sidebarDimension": 240,
+      "minYValue": null,
+      "maxYValue": null,
+      "followingViewWidth": null,
+      "xAxisPath": {
+        "value": "/mavlink/1/1/LOCAL_POSITION_NED.y",
+        "enabled": true,
+        "timestampMethod": "receiveTime"
+      }
+    },
+    "StateTransitions!apm_modes": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/HEARTBEAT.custom_mode",
+          "timestampMethod": "receiveTime",
+          "label": "Flight Mode"
+        },
+        {
+          "value": "/mavlink/1/1/HEARTBEAT.system_status_enum",
+          "timestampMethod": "receiveTime",
+          "label": "Vehicle State"
+        },
+        {
+          "value": "/mavlink/1/1/HEARTBEAT.base_mode_flags[:]",
+          "timestampMethod": "receiveTime",
+          "label": "Mode Flags"
+        }
+      ],
+      "isSynced": true,
+      "foxglovePanelTitle": "Flight Modes"
+    },
+    "Gauge!apm_attitude_roll": {
+      "path": "/mavlink/1/1/ATTITUDE.roll",
+      "minValue": -3.15,
+      "maxValue": 3.15,
+      "colorMode": "colormap",
+      "colorMap": "rainbow",
+      "gradient": [
+        "#0000ff",
+        "#ff00ff"
+      ],
+      "reverse": false,
+      "foxglovePanelTitle": "Attitude \u2014 Roll [rad]"
+    },
+    "Gauge!apm_attitude_pitch": {
+      "path": "/mavlink/1/1/ATTITUDE.pitch",
+      "minValue": -1.58,
+      "maxValue": 1.58,
+      "colorMode": "colormap",
+      "colorMap": "rainbow",
+      "gradient": [
+        "#0000ff",
+        "#ff00ff"
+      ],
+      "reverse": false,
+      "foxglovePanelTitle": "Attitude \u2014 Pitch [rad]"
+    },
+    "Plot!apm_attitude": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/ATTITUDE.roll",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Roll",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/ATTITUDE.pitch",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Pitch",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/ATTITUDE.yaw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Yaw",
+          "color": "#e15759"
+        }
+      ],
+      "foxglovePanelTitle": "Attitude [rad]",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": null,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!apm_radio_sticks": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/RC_CHANNELS.chan1_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C1 Roll",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/RC_CHANNELS.chan2_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C2 Pitch",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/RC_CHANNELS.chan3_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C3 Throttle",
+          "color": "#e15759"
+        },
+        {
+          "value": "/mavlink/1/1/RC_CHANNELS.chan4_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C4 Yaw",
+          "color": "#76b7b2"
+        }
+      ],
+      "foxglovePanelTitle": "Radio Sticks [us]",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": null,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!apm_radio_aux": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/RC_CHANNELS.chan5_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C5",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/RC_CHANNELS.chan6_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C6",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/RC_CHANNELS.chan7_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C7",
+          "color": "#e15759"
+        },
+        {
+          "value": "/mavlink/1/1/RC_CHANNELS.chan8_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C8",
+          "color": "#76b7b2"
+        }
+      ],
+      "foxglovePanelTitle": "RC Input 5-8 [us]",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": null,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Table!apm_parameters": {
+      "topicPath": "/mavlink/1/1/PARAM_VALUE",
+      "foxglovePanelTitle": "Parameters"
+    },
+    "Log!apm_messages": {
+      "topicToRender": "/mavlink/1/1/log",
+      "minLogLevel": 1,
+      "searchTerms": [],
+      "foxglovePanelTitle": "Messages"
+    },
+    "Plot!apm_ekf_variances": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/EKF_STATUS_REPORT.velocity_variance",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Velocity",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/EKF_STATUS_REPORT.pos_horiz_variance",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Horizontal Position",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/EKF_STATUS_REPORT.pos_vert_variance",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Vertical Position",
+          "color": "#e15759"
+        },
+        {
+          "value": "/mavlink/1/1/EKF_STATUS_REPORT.compass_variance",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Compass",
+          "color": "#76b7b2"
+        },
+        {
+          "value": "/mavlink/1/1/EKF_STATUS_REPORT.terrain_alt_variance",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Terrain Altitude",
+          "color": "#59a14f"
+        },
+        {
+          "value": "/mavlink/1/1/EKF_STATUS_REPORT.airspeed_variance",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Airspeed",
+          "color": "#edc949"
+        }
+      ],
+      "foxglovePanelTitle": "EKF helper \u2014 Variances",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": 0,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "StateTransitions!apm_ekf_flags": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/EKF_STATUS_REPORT.flags_flags[:]",
+          "timestampMethod": "receiveTime",
+          "label": "EKF Solution Status"
+        }
+      ],
+      "isSynced": true,
+      "foxglovePanelTitle": "EKF helper \u2014 Solution Status"
+    },
+    "RawMessages!apm_sensors": {
+      "topicPath": "/mavlink/1/1/SYS_STATUS",
+      "diffEnabled": false,
+      "expansion": "all",
+      "foxglovePanelTitle": "Sensors \u2014 Health"
+    },
+    "Plot!apm_magfit": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/SCALED_IMU.xmag",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "MagX",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/SCALED_IMU.ymag",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "MagY",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/SCALED_IMU.zmag",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "MagZ",
+          "color": "#e15759"
+        }
+      ],
+      "foxglovePanelTitle": "Mag Fit Tool \u2014 Compass [mgauss]",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": null,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!apm_magfit_report": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/MAG_CAL_REPORT.fitness",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Fitness [mgauss]",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/MAG_CAL_REPORT.ofs_x",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Offset X",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/MAG_CAL_REPORT.ofs_y",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Offset Y",
+          "color": "#e15759"
+        },
+        {
+          "value": "/mavlink/1/1/MAG_CAL_REPORT.ofs_z",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Offset Z",
+          "color": "#76b7b2"
+        }
+      ],
+      "foxglovePanelTitle": "Mag Fit Tool \u2014 Calibration",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": null,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!apm_vibration": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/VIBRATION.vibration_x",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "VibeX",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/VIBRATION.vibration_y",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "VibeY",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/VIBRATION.vibration_z",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "VibeZ",
+          "color": "#e15759"
+        }
+      ],
+      "foxglovePanelTitle": "Sensors/Accelerometer/Vibration",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": 0,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!apm_clipping": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/VIBRATION.clipping_0",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Clip0",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/VIBRATION.clipping_1",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Clip1",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/VIBRATION.clipping_2",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Clip2",
+          "color": "#e15759"
+        }
+      ],
+      "foxglovePanelTitle": "Sensors/Accelerometer/Clipping",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": 0,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!apm_power": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/SYS_STATUS.voltage_battery",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Volt [mV]",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/SYS_STATUS.current_battery",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Curr [cA]",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/BATTERY_STATUS.battery_remaining",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Remaining [%]",
+          "color": "#e15759"
+        }
+      ],
+      "foxglovePanelTitle": "Power/Current and Voltage",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": 0,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!apm_board_power": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/POWER_STATUS.Vcc",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Vcc [mV]",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/POWER_STATUS.Vservo",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Vservo [mV]",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/MEMINFO.freemem",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Free Memory [bytes]",
+          "color": "#e15759"
+        }
+      ],
+      "foxglovePanelTitle": "Board/Power",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": 0,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!apm_speed": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/VFR_HUD.groundspeed",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Ground Speed",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/VFR_HUD.airspeed",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Airspeed",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/WIND.speed",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Wind Speed",
+          "color": "#e15759"
+        }
+      ],
+      "foxglovePanelTitle": "Speed/Ground Speed [m/s]",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": 0,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!apm_servos": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/SERVO_OUTPUT_RAW.servo1_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C1",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/SERVO_OUTPUT_RAW.servo2_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C2",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/SERVO_OUTPUT_RAW.servo3_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C3",
+          "color": "#e15759"
+        },
+        {
+          "value": "/mavlink/1/1/SERVO_OUTPUT_RAW.servo4_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C4",
+          "color": "#76b7b2"
+        },
+        {
+          "value": "/mavlink/1/1/SERVO_OUTPUT_RAW.servo5_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C5",
+          "color": "#59a14f"
+        },
+        {
+          "value": "/mavlink/1/1/SERVO_OUTPUT_RAW.servo6_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C6",
+          "color": "#edc949"
+        },
+        {
+          "value": "/mavlink/1/1/SERVO_OUTPUT_RAW.servo7_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C7",
+          "color": "#af7aa1"
+        },
+        {
+          "value": "/mavlink/1/1/SERVO_OUTPUT_RAW.servo8_raw",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "C8",
+          "color": "#ff9da7"
+        }
+      ],
+      "foxglovePanelTitle": "Servos/Servos 1-8 [us]",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": null,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!apm_gps_accuracy": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/GPS_RAW_INT.eph",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "HDop",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/GPS_RAW_INT.epv",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "VDop",
+          "color": "#f28e2c"
+        },
+        {
+          "value": "/mavlink/1/1/GPS_RAW_INT.satellites_visible",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "NSats",
+          "color": "#e15759"
+        },
+        {
+          "value": "/mavlink/1/1/GPS_RAW_INT.fix_type",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Status",
+          "color": "#76b7b2"
+        }
+      ],
+      "foxglovePanelTitle": "Sensors/GPS/GPS Accuracy",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": 0,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Plot!apm_rangefinder": {
+      "paths": [
+        {
+          "value": "/mavlink/1/1/RANGEFINDER.distance",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Distance [m]",
+          "color": "#4e79a7"
+        },
+        {
+          "value": "/mavlink/1/1/RANGEFINDER.voltage",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "label": "Voltage [V]",
+          "color": "#f28e2c"
+        }
+      ],
+      "foxglovePanelTitle": "Sensors/Rangefinder",
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": 0,
+      "maxYValue": null,
+      "followingViewWidth": null
+    },
+    "Tab!apm_log_viewer": {
+      "activeTabIdx": 0,
+      "tabs": [
+        {
+          "title": "3D",
+          "layout": {
+            "direction": "row",
+            "first": "3D!apm_cesium",
+            "second": {
+              "direction": "column",
+              "first": "Map!apm_map",
+              "second": {
+                "direction": "column",
+                "first": "Plot!apm_ground_track",
+                "second": "StateTransitions!apm_modes",
+                "splitPercentage": 60
+              },
+              "splitPercentage": 55
+            },
+            "splitPercentage": 62
+          }
+        },
+        {
+          "title": "Widgets",
+          "layout": {
+            "direction": "column",
+            "first": {
+              "direction": "column",
+              "first": {
+                "direction": "row",
+                "first": {
+                  "direction": "row",
+                  "first": "Plot!apm_attitude",
+                  "second": "Gauge!apm_attitude_roll",
+                  "splitPercentage": 50.0
+                },
+                "second": {
+                  "direction": "row",
+                  "first": "Gauge!apm_attitude_pitch",
+                  "second": "Plot!apm_radio_sticks",
+                  "splitPercentage": 50.0
+                },
+                "splitPercentage": 50.0
+              },
+              "second": {
+                "direction": "row",
+                "first": {
+                  "direction": "row",
+                  "first": "Plot!apm_radio_aux",
+                  "second": "Table!apm_parameters",
+                  "splitPercentage": 50.0
+                },
+                "second": {
+                  "direction": "row",
+                  "first": "Log!apm_messages",
+                  "second": "Plot!apm_ekf_variances",
+                  "splitPercentage": 50.0
+                },
+                "splitPercentage": 50.0
+              },
+              "splitPercentage": 50.0
+            },
+            "second": {
+              "direction": "column",
+              "first": {
+                "direction": "row",
+                "first": {
+                  "direction": "row",
+                  "first": "StateTransitions!apm_ekf_flags",
+                  "second": "RawMessages!apm_sensors",
+                  "splitPercentage": 50.0
+                },
+                "second": {
+                  "direction": "row",
+                  "first": "Plot!apm_magfit",
+                  "second": "Plot!apm_magfit_report",
+                  "splitPercentage": 50.0
+                },
+                "splitPercentage": 50.0
+              },
+              "second": {
+                "direction": "column",
+                "first": {
+                  "direction": "row",
+                  "first": {
+                    "direction": "row",
+                    "first": "Plot!apm_vibration",
+                    "second": "Plot!apm_clipping",
+                    "splitPercentage": 50.0
+                  },
+                  "second": {
+                    "direction": "row",
+                    "first": "Plot!apm_power",
+                    "second": "Plot!apm_board_power",
+                    "splitPercentage": 50.0
+                  },
+                  "splitPercentage": 50.0
+                },
+                "second": {
+                  "direction": "row",
+                  "first": {
+                    "direction": "row",
+                    "first": "Plot!apm_speed",
+                    "second": "Plot!apm_servos",
+                    "splitPercentage": 50.0
+                  },
+                  "second": {
+                    "direction": "row",
+                    "first": "Plot!apm_gps_accuracy",
+                    "second": "Plot!apm_rangefinder",
+                    "splitPercentage": 50.0
+                  },
+                  "splitPercentage": 50.0
+                },
+                "splitPercentage": 50.0
+              },
+              "splitPercentage": 33.333333333333336
+            },
+            "splitPercentage": 40.0
+          }
+        }
+      ]
+    }
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "layout": "Tab!apm_log_viewer"
+}
